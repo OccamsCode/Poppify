@@ -10,6 +10,11 @@ import Foundation
 public struct Resource<T> {
     let request: Requestable
     let decode: (Data) throws -> T
+    
+    init(request: Requestable, decode: @escaping (Data) throws -> T) {
+        self.request = request
+        self.decode = decode
+    }
 }
 
 public extension Resource where T: Decodable {
