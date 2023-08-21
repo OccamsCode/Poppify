@@ -28,6 +28,14 @@ public struct Environment: EnvironmentType, CustomStringConvertible {
     public let port: Int?
     public let secret: Secret?
 
+    public init(scheme: HTTP.Scheme, endpoint: String, addtionalHeaders: [String : String], port: Int?, secret: Secret?) {
+        self.scheme = scheme
+        self.endpoint = endpoint
+        self.addtionalHeaders = addtionalHeaders
+        self.port = port
+        self.secret = secret
+    }
+    
     public var description: String {
         var output = "\(scheme.rawValue)-\(endpoint)"
         if let port = port {
