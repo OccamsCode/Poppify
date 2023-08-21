@@ -18,7 +18,7 @@ public protocol URLSessionType {
                   completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionTaskType
     
     @available(iOS 13.0.0, *)
-    func data(for request: URLRequest) async throws -> (Data, URLResponse)
+    func sendRequest(for request: URLRequest) async throws -> (Data, URLResponse)
 }
 
 extension URLSession: URLSessionType {
@@ -26,9 +26,14 @@ extension URLSession: URLSessionType {
                   completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionTaskType {
         return self.dataTask(with: request, completionHandler: completion)
     }
+    
+    @available(iOS 13.0.0, *)
+    public func sendRequest(for request: URLRequest) async throws -> (Data, URLResponse) {
+        return try await self.data(for: request)
+    }
 }
 
-public enum APIError: Error, Equatable {
+public enum RequestError: Error, Equatable {
 
     case invalidData
     case invalidResponse
@@ -46,7 +51,7 @@ public enum APIError: Error, Equatable {
         }
     }
 
-    public static func == (lhs: APIError, rhs: APIError) -> Bool {
+    public static func == (lhs: RequestError, rhs: RequestError) -> Bool {
         switch (lhs, rhs) {
         case (.invalidData, .invalidData),
             (.invalidResponse, .invalidResponse),
@@ -65,15 +70,15 @@ public protocol Client {
     var urlSession: URLSessionType { get }
 
     func dataTask<T>(with resource: Resource<T>,
-                     completion: @escaping (Result<T, APIError>) -> Void ) -> URLSessionTaskType? where T: Decodable
+                     completion: @escaping (Result<T, RequestError>) -> Void ) -> URLSessionTaskType? where T: Decodable
     
     @available(iOS 13.0.0, *)
-    func sendRequest<T>(with resource: Resource<T>) async -> Result<T, APIError>?
+    func sendRequest<T>(with resource: Resource<T>) async -> Result<T, RequestError>?
 }
 
 public extension Client {
     func dataTask<T>(with resource: Resource<T>,
-                     completion: @escaping (Result<T, APIError>) -> Void ) -> URLSessionTaskType? where T: Decodable {
+                     completion: @escaping (Result<T, RequestError>) -> Void ) -> URLSessionTaskType? where T: Decodable {
 
         guard let urlReqest = URLRequest(request: resource.request,
                                          in: environment) else { return nil }
@@ -108,13 +113,13 @@ public extension Client {
     }
     
     @available(iOS 13.0.0, *)
-    func sendRequest<T>(with resource: Resource<T>) async -> Result<T, APIError>? {
+    func sendRequest<T>(with resource: Resource<T>) async -> Result<T, RequestError>? {
         
         guard let urlReqest = URLRequest(request: resource.request,
                                          in: environment) else { return nil }
         
         do {
-            let (data, response) = try await urlSession.data(for: urlReqest)
+            let (data, response) = try await urlSession.sendRequest(for: urlReqest)
             guard let httpResponse = response as? HTTPURLResponse else {
                 return .failure(.invalidResponse)
             }
