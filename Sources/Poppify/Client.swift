@@ -17,7 +17,7 @@ public protocol URLSessionType {
     func dataTask(with request: URLRequest,
                   completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionTaskType
     
-    @available(iOS 13.0.0, *)
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func sendRequest(for request: URLRequest) async throws -> (Data, URLResponse)
 }
 
@@ -27,7 +27,7 @@ extension URLSession: URLSessionType {
         return self.dataTask(with: request, completionHandler: completion)
     }
     
-    @available(iOS 13.0.0, *)
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public func sendRequest(for request: URLRequest) async throws -> (Data, URLResponse) {
         return try await self.data(for: request)
     }
@@ -72,7 +72,7 @@ public protocol Client {
     func dataTask<T>(with resource: Resource<T>,
                      completion: @escaping (Result<T, RequestError>) -> Void ) -> URLSessionTaskType? where T: Decodable
     
-    @available(iOS 13.0.0, *)
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func sendRequest<T>(with resource: Resource<T>) async -> Result<T, RequestError>?
 }
 
@@ -112,7 +112,7 @@ public extension Client {
         return task
     }
     
-    @available(iOS 13.0.0, *)
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func sendRequest<T>(with resource: Resource<T>) async -> Result<T, RequestError>? {
         
         guard let urlReqest = URLRequest(request: resource.request,
