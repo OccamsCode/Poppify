@@ -71,7 +71,7 @@ public protocol Client {
 
 public extension Client {
     func dataTask<T>(with resource: Resource<T>,
-                     completion: @escaping (Result<T, APIError>) -> Void ) -> URLSessionTaskType? {
+                     completion: @escaping (Result<T, APIError>) -> Void ) -> URLSessionTaskType? where T: Decodable {
 
        // Log.verbose(resource.request)
 
