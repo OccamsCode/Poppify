@@ -16,6 +16,9 @@ extension URLSessionDataTask: URLSessionTaskType {}
 public protocol URLSessionType {
     func dataTask(with request: URLRequest,
                   completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionTaskType
+    
+    @available(iOS 13.0.0, *)
+    func data(for request: URLRequest) async throws -> (Data, URLResponse)
 }
 
 extension URLSession: URLSessionType {
@@ -25,13 +28,11 @@ extension URLSession: URLSessionType {
     }
 }
 
-// swiftlint:disable empty_enum_arguments
-// swiftlint:disable line_length
 public enum APIError: Error, Equatable {
 
     case invalidData
     case invalidResponse
-    case unhandledStatusCode(code: Int)
+    case unhandledStatusCode(Int)
     case response(error: Error)
     case decode(error: Error)
 
@@ -57,8 +58,6 @@ public enum APIError: Error, Equatable {
         }
     }
 }
-// swiftlint:enable empty_enum_arguments
-// swiftlint:enable line_length
 
 public protocol Client {
 
@@ -67,13 +66,14 @@ public protocol Client {
 
     func dataTask<T>(with resource: Resource<T>,
                      completion: @escaping (Result<T, APIError>) -> Void ) -> URLSessionTaskType? where T: Decodable
+    
+    @available(iOS 13.0.0, *)
+    func sendRequest<T>(with resource: Resource<T>) async -> Result<T, APIError>?
 }
 
 public extension Client {
     func dataTask<T>(with resource: Resource<T>,
                      completion: @escaping (Result<T, APIError>) -> Void ) -> URLSessionTaskType? where T: Decodable {
-
-       // Log.verbose(resource.request)
 
         guard let urlReqest = URLRequest(request: resource.request,
                                          in: environment) else { return nil }
@@ -87,8 +87,10 @@ public extension Client {
             guard let httpResponse = response as? HTTPURLResponse else {
                 return completion(.failure(.invalidResponse))
             }
-
-            switch httpResponse.statusCode {
+            
+            let statusCode = httpResponse.statusCode
+            
+            switch statusCode {
             case 200...299:
                 guard let data = data else { return completion(.failure(.invalidData)) }
                 do {
@@ -98,10 +100,35 @@ public extension Client {
                     completion(.failure(.decode(error: error)))
                 }
             default:
-                completion(.failure(.unhandledStatusCode(code: httpResponse.statusCode)))
+                completion(.failure(.unhandledStatusCode(statusCode)))
             }
 
         }
         return task
+    }
+    
+    @available(iOS 13.0.0, *)
+    func sendRequest<T>(with resource: Resource<T>) async -> Result<T, APIError>? {
+        
+        guard let urlReqest = URLRequest(request: resource.request,
+                                         in: environment) else { return nil }
+        
+        do {
+            let (data, response) = try await urlSession.data(for: urlReqest)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                return .failure(.invalidResponse)
+            }
+            
+            let statusCode = httpResponse.statusCode
+            switch statusCode {
+            case 200...299:
+                let decodedResponse = try resource.decode(data)
+                return .success(decodedResponse)
+            default:
+                return .failure(.unhandledStatusCode(statusCode))
+            }
+        } catch {
+            return .failure(.decode(error: error))
+        }
     }
 }
