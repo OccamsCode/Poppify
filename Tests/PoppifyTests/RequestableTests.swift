@@ -2,7 +2,7 @@
 //  RequestableTests.swift
 //  
 //
-//  Created by Brian Munjoma on 21/08/2023.
+//  Created by Brian Munjoma
 //
 
 import XCTest
@@ -89,5 +89,75 @@ final class CustomRequestableTests: XCTestCase {
         let result = sut.body
 
         XCTAssertNotNil(result)
+    }
+}
+
+final class RequestableURLTests: XCTestCase {
+    var environment: EnvironmentType!
+    var sut: Requestable!
+    let mockPath = "/v1/mock"
+    
+    override func setUp() {
+        environment = MockSecureEnvironment()
+        sut = MockCustomRequest(path: mockPath)
+    }
+    
+    override func tearDown() {
+        sut = nil
+        environment = nil
+    }
+    
+    func testCreatedURL_scheme_isCorrectScheme() {
+        
+        let result = sut.url(using: environment)
+        
+        XCTAssertEqual(result?.scheme, "https")
+    }
+    
+    func testCreatedURL_host_isCorrectHost() {
+        
+        let result = sut.url(using: environment)
+        
+        XCTAssertEqual(result?.host, "api.mock.org")
+    }
+    func testCreatedURL_port_isCorrectPort() {
+        
+        let result = sut.url(using: environment)
+        
+        XCTAssertEqual(result?.port, 443)
+    }
+    
+    func testCreatedURL_path_isCorrectPath() {
+        
+        let result = sut.url(using: environment)
+        
+        XCTAssertEqual(result?.path, "/v1/mock")
+    }
+    
+    func testCreatedURL_queryItems_containsQueryItems() throws {
+        
+        let result = try XCTUnwrap(sut.url(using: environment)?.query)
+        
+        for queryItem in sut.parameters {
+            XCTAssertTrue(result.contains(queryItem.name))
+            
+            let value = try XCTUnwrap(queryItem.value)
+            XCTAssertTrue(result.contains(value))
+        }
+    }
+    
+    func testCreatedURL_queryItems_isContainsUnsecureSecret() throws {
+        
+        let unsecure = MockUnsecureEnvironment()
+        let result = try XCTUnwrap(sut.url(using: unsecure)?.query)
+        
+        guard case let .queryItem(queryItem) = unsecure.secret else {
+            return XCTFail()
+        }
+        
+        XCTAssertTrue(result.contains(queryItem.name))
+        
+        let value = try XCTUnwrap(queryItem.value)
+        XCTAssertTrue(result.contains(value))
     }
 }

@@ -2,7 +2,7 @@
 //  JSONParserTests.swift
 //  
 //
-//  Created by Brian Munjoma on 21/08/2023.
+//  Created by Brian Munjoma
 //
 
 import XCTest
@@ -20,7 +20,7 @@ final class JSONParserTests: XCTestCase {
         sut = nil
     }
     
-    func test_InvalidData_ResultsInError() {
+    func test_closureParser_InvalidData_ResultsInError() {
         
         var result: ParserError?
         
@@ -41,7 +41,7 @@ final class JSONParserTests: XCTestCase {
         
     }
     
-    func test_ValidData_NoError() {
+    func test_closureParser_ValidData_NoError() {
         
         var result: MockModel?
         
@@ -65,6 +65,30 @@ final class JSONParserTests: XCTestCase {
         wait(for: [expecation], timeout: 0.1)
         
         XCTAssertNotNil(result)
+        
+    }
+
+    func test_returnParser_InvalidData_ResultsInError() {
+        
+        let errData = "invalid".data(using: .utf8)!
+        
+        XCTAssertThrowsError(try sut.parse(errData, into: MockModel.self)) { error in
+            XCTAssertTrue(error is DecodingError)
+        }
+
+    }
+    
+    func test_returnParser_ValidData_NoError() {
+        
+        let errData = """
+            {
+                "name":"Gordon",
+                "age":10,
+                "isDone": true
+            }
+            """.data(using: .utf8)!
+        
+        XCTAssertNoThrow(try sut.parse(errData, into: MockModel.self))
         
     }
 
