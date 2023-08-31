@@ -38,7 +38,7 @@ final class ClientTests: XCTestCase {
         let expecation = expectation(description: "Loading URL with no data")
         
         // When
-        sut.dataTask(with: resource) { result in
+        sut.executeRequest(with: resource) { result in
             switch result {
             case .failure(let error): apiError = error
             default: break
@@ -62,7 +62,7 @@ final class ClientTests: XCTestCase {
         let expecation = expectation(description: "Loading URL")
         
         // When
-        sut.dataTask(with: resource) { result in
+        sut.executeRequest(with: resource) { result in
             switch result {
             case .failure(let error): apiError = error
             default: break
@@ -85,7 +85,7 @@ final class ClientTests: XCTestCase {
         let expecation = expectation(description: "Loading URL")
         
         // When
-        sut.dataTask(with: resource) { result in
+        sut.executeRequest(with: resource) { result in
             switch result {
             case .failure(let error): apiError = error
             default: break
@@ -108,7 +108,7 @@ final class ClientTests: XCTestCase {
         let expecation = expectation(description: "Loading URL")
         
         // When
-        sut.dataTask(with: resource) { result in
+        sut.executeRequest(with: resource) { result in
             switch result {
             case .failure(let error): apiError = error
             default: break
@@ -134,7 +134,7 @@ final class ClientTests: XCTestCase {
         let expecation = expectation(description: "Loading URL")
         
         // When
-        sut.dataTask(with: resource) { result in
+        sut.executeRequest(with: resource) { result in
             switch result {
             case .failure(let error): apiError = error
             default: break
@@ -159,7 +159,7 @@ final class ClientTests: XCTestCase {
         let expecation = expectation(description: "Loading URL")
         
         // When
-        sut.dataTask(with: resource) { result in
+        sut.executeRequest(with: resource) { result in
             switch result {
             case .success(let sData): data = sData
             default: break
@@ -203,7 +203,7 @@ final class AsyncClientTests: XCTestCase {
         session.error = MockError.err
         
         // When
-        let result = await sut.sendRequest(with: resource)
+        let result = await sut.executeRequest(with: resource)
         
         // Then
         switch result {
@@ -221,7 +221,7 @@ final class AsyncClientTests: XCTestCase {
         session.data = Data()
         
         // When
-        let result = await sut.sendRequest(with: resource)
+        let result = await sut.executeRequest(with: resource)
         
         // Then
         switch result {
@@ -239,7 +239,7 @@ final class AsyncClientTests: XCTestCase {
         session.data = Data()
         
         // When
-        let result = await sut.sendRequest(with: resource)
+        let result = await sut.executeRequest(with: resource)
         
         // Then
         switch result {
@@ -258,7 +258,7 @@ final class AsyncClientTests: XCTestCase {
         session.data = "Bad Data".data(using: .utf8)!
         
         // When
-        let result = await sut.sendRequest(with: resource)
+        let result = await sut.executeRequest(with: resource)
         
         // Then
         switch result {
@@ -276,7 +276,7 @@ final class AsyncClientTests: XCTestCase {
         session.data = "data".data(using: .utf8)!
         
         // When
-        let result = await sut.sendRequest(with: resource)
+        let result = await sut.executeRequest(with: resource)
         
         // Then
         switch result {

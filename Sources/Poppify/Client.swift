@@ -120,7 +120,7 @@ public protocol Client {
     ///   - resource: The resource used to create the request
     ///   - completion: The completion handler to be executed following the execution of the request
     /// - Returns: An object which conforms to `URLSessionTaskType`
-    func dataTask<T>(with resource: Resource<T>,
+    func executeRequest<T>(with resource: Resource<T>,
                      completion: @escaping (Result<T, RequestError>) -> Void ) -> URLSessionTaskType? where T: Decodable
     
     /// Retrieves the contents for a resource and delivers the data asynchronously.
@@ -128,11 +128,11 @@ public protocol Client {
     /// - Parameter resource: The resource used to create the request
     /// - Returns: An asynchronously-delivered `Result` containing the parsed contents for the resource or `RequestError`
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    func sendRequest<T>(with resource: Resource<T>) async -> Result<T, RequestError>
+    func executeRequest<T>(with resource: Resource<T>) async -> Result<T, RequestError>
 }
 
 public extension Client {
-    func dataTask<T>(with resource: Resource<T>,
+    func executeRequest<T>(with resource: Resource<T>,
                      completion: @escaping (Result<T, RequestError>) -> Void ) -> URLSessionTaskType? where T: Decodable {
 
         guard let urlRequest = URLRequest(request: resource.request,
@@ -168,7 +168,7 @@ public extension Client {
     }
     
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    func sendRequest<T>(with resource: Resource<T>) async -> Result<T, RequestError> {
+    func executeRequest<T>(with resource: Resource<T>) async -> Result<T, RequestError> {
         
         guard let urlRequest = URLRequest(request: resource.request,
                                           in: environment) else { return .failure(.invalidRequest) }
