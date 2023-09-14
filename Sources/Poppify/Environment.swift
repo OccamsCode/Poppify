@@ -65,7 +65,11 @@ public struct Environment: EnvironmentType, CustomDebugStringConvertible {
     public let port: Int?
     public let secret: Secret?
 
-    public init(scheme: HTTP.Scheme, endpoint: String, additionalHeaders: [String : String], port: Int?, secret: Secret?) {
+    public init(scheme: HTTP.Scheme,
+                endpoint: String,
+                additionalHeaders: [String : String] = [:],
+                port: Int? = nil,
+                secret: Secret? = nil) {
         self.scheme = scheme
         self.endpoint = endpoint
         self.additionalHeaders = additionalHeaders
