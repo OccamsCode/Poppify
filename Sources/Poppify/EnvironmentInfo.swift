@@ -1,5 +1,5 @@
 //
-//    Environment.swift
+//    EnvironmentInfo.swift
 //    Poppify
 //
 //    Created by Brian Munjoma on 21/08/2023.
@@ -57,7 +57,7 @@ public protocol EnvironmentType {
 
 
 /// A simple value which conforms to `EnvironmentType` and contains a `debugDescription` for debugging purposes.
-public struct Environment: EnvironmentType, CustomDebugStringConvertible {
+public struct EnvironmentInfo: EnvironmentType, CustomDebugStringConvertible {
 
     public let scheme: HTTP.Scheme
     public let endpoint: String
