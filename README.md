@@ -18,7 +18,7 @@ To install Poppify using [Swift Package Manager](https://github.com/apple/swift-
 or you can add the following dependency to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/OccamsCode/Poppify/", from: "1.0.0")
+.package(url: "https://github.com/OccamsCode/Poppify/", from: "1.0.2")
 ```
 
 ## Usage
@@ -33,14 +33,14 @@ or you can add the following dependency to your `Package.swift`:
 
 The `EnvironmentType` protocol represents various aspects of an environment such as; base endpoint, port, HTTP/HTTPS and whether the api secret sent in the header or as a query item.
 
-The existing `Environment` type, which simply conforms to `EnvironmentType`, can be used or a custom environment can be created
+The existing `EnvironmentInfo` type, which simply conforms to `EnvironmentType`, can be used or a custom environment can be created
 
 ```swift
-let testEnvironment = Environment(scheme: .secure,
-                                  endpoint: "jsonplaceholder.typicode.com",
-                                  additionalHeaders: [:],
-                                  port: nil,
-                                  secret: .header("apiKey", value: "some_api_key"))
+let testEnvironment = EnvironmentInfo(scheme: .secure,
+                                    endpoint: "jsonplaceholder.typicode.com",
+                                    additionalHeaders: [:],
+                                    port: nil,
+                                    secret: .header("apiKey", value: "some_api_key"))
 
 struct CustomEnvironment: EnvironmentType {
     ...
