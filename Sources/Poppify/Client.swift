@@ -55,8 +55,7 @@ extension URLSession: URLSessionType {
 }
 
 /// Encapsulates various types of errors encounters when executing a request
-public enum RequestError: Error, Equatable {
-
+public enum RequestError: Error {
     /// Uable to create a valid request
     case invalidRequest
     
@@ -74,19 +73,9 @@ public enum RequestError: Error, Equatable {
     
     /// The decoding failed with the given error
     case decode(error: Error)
-    
-    var localizedDescription: String {
-        switch self {
-        case .invalidData: return "Invalid Data"                                            // No data sent
-        case .invalidResponse: return "Invalid Response"                                    // URLResponse not HTTPURLResponse
-        case .unhandledStatusCode(let code): return "Invalid Response StatusCode \(code)"   // Status Code not 2xx
-        case .response(let error): return "Response Error \(error)"                         // Error from Request
-        case .decode(let error): return "Decode Error \(error)"                             // Error from Decoder
-        case .invalidRequest:
-            return "Unable to create valid request for resource in environment"
-        }
-    }
+}
 
+extension RequestError: Equatable {
     public static func == (lhs: RequestError, rhs: RequestError) -> Bool {
         switch (lhs, rhs) {
         case (.invalidData, .invalidData),
@@ -96,6 +85,25 @@ public enum RequestError: Error, Equatable {
             (.decode(_), .decode(_)):
             return true
         default: return false
+        }
+    }
+}
+
+extension RequestError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .invalidData:
+            return NSLocalizedString("Invalid Data", comment: "No data sent")                                           // No data sent
+        case .invalidResponse:
+            return NSLocalizedString("Invalid Response", comment: "URLResponse not HTTPURLResponse")                    // URLResponse not HTTPURLResponse
+        case .unhandledStatusCode(let code):
+            return NSLocalizedString("Invalid Response StatusCode \(code)" , comment: "Status Code not 2xx")            // Status Code not 2xx
+        case .response(let error):
+            return NSLocalizedString("Response Error \(error.localizedDescription)", comment: "Error from Request")     // Error from Request
+        case .decode(let error):
+            return NSLocalizedString("Decode Error \(error.localizedDescription)" , comment: "Error from Decoder")      // Error from Decoder
+        case .invalidRequest:
+            return NSLocalizedString("Unable to create valid request for resource in environment", comment: "Error during request creation")
         }
     }
 }
