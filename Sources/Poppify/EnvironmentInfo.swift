@@ -88,3 +88,37 @@ public struct EnvironmentInfo: EnvironmentType, CustomDebugStringConvertible {
         return output
     }
 }
+
+/// A simple value which conforms to `EnvironmentType` and contains a `debugDescription` for debugging purposes.
+@available(*, deprecated, renamed: "EnvironmentInfo")
+public struct Environment: EnvironmentType, CustomDebugStringConvertible {
+
+    public let scheme: HTTP.Scheme
+    public let endpoint: String
+    public let additionalHeaders: [String: String]
+    public let port: Int?
+    public let secret: Secret?
+
+    public init(scheme: HTTP.Scheme,
+                endpoint: String,
+                additionalHeaders: [String : String] = [:],
+                port: Int? = nil,
+                secret: Secret? = nil) {
+        self.scheme = scheme
+        self.endpoint = endpoint
+        self.additionalHeaders = additionalHeaders
+        self.port = port
+        self.secret = secret
+    }
+    
+    /// A textual representation of this instance, suitable for debugging.
+    ///
+    /// The values for `additionalHeaders` and `secret` are purposely omitted
+    public var debugDescription: String {
+        var output = "\(scheme.rawValue)-\(endpoint)"
+        if let port = port {
+            output += ":\(port)"
+        }
+        return output
+    }
+}
