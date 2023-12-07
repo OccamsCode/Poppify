@@ -90,7 +90,7 @@ public struct EnvironmentInfo: EnvironmentType, CustomDebugStringConvertible {
 }
 
 /// A simple value which conforms to `EnvironmentType` and contains a `debugDescription` for debugging purposes.
-@available(*, deprecated, renamed: "EnvironmentInfo")
+@available(*, unavailable, renamed: "EnvironmentInfo")
 public struct Environment: EnvironmentType, CustomDebugStringConvertible {
 
     public let scheme: HTTP.Scheme
