@@ -308,7 +308,7 @@ public extension Client {
     /// - Important: The resource should be configured with the necessary details, such as the URL and HTTP method.
     ///              Ensure that the necessary permissions and capabilities are set for network requests.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    func executeRequest<T>(with resource: Resource<T>) -> AnyPublisher<T, RequestError> where T: Decodable {
+    func executeRequestPublisher<T>(with resource: Resource<T>) -> AnyPublisher<T, RequestError> where T: Decodable {
 
             guard let urlRequest = URLRequest(request: resource.request,
                                               in: environment) else {
