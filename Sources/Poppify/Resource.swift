@@ -31,16 +31,16 @@ import Foundation
 public struct Resource<T> {
     
     /// A  value which conforms to the `Requestable` protocol
-    let request: Requestable
+    public let request: Requestable
     
     /// A closure which is used to decode the response data
-    let decode: (Data) throws -> T
+    public let decode: (Data) throws -> T
     
     /// Creates a `Resource` object
     /// - Parameters:
     ///   - request: The request used to fetch the resource
     ///   - decode: The action used the decode the response into an usable object
-    init(request: Requestable, decode: @escaping (Data) throws -> T) {
+    public init(request: Requestable, decode: @escaping (Data) throws -> T) {
         self.request = request
         self.decode = decode
     }
