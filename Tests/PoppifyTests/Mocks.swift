@@ -5,8 +5,9 @@
 //  Created by Brian Munjoma.
 //
 
-import Foundation
 @testable import Poppify
+import Foundation
+import Combine
 
 struct MockModel: Decodable {
     let name: String
@@ -79,7 +80,7 @@ final class MockResponse {
 
 // MARK: - URLSession
 final class MockURLSession: URLSessionType {
-    
+
     var data: Data?
     var response: URLResponse?
     var error: Error?
@@ -98,6 +99,22 @@ final class MockURLSession: URLSessionType {
             throw RequestError.invalidRequest
         }
         return (data, response)
+    }
+    
+    @available(iOS 13.0.0, *)
+    func sendPublisherRequest(for request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError> {
+        if error != nil {
+            return Fail(error: URLError(.init(rawValue: 300)))
+                .eraseToAnyPublisher()
+        }
+        
+        guard let data = data, let response = response else {
+            return Fail(error: URLError(.init(rawValue: 300)))
+                .eraseToAnyPublisher()
+        }
+        return Just((data, response))
+            .setFailureType(to: URLError.self)
+            .eraseToAnyPublisher()
     }
 }
 
