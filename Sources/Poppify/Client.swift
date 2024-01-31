@@ -167,7 +167,7 @@ public protocol Client {
     /// - Parameter resource: The resource used to create the request
     /// - Returns: An asynchronously-delivered `Result` containing the parsed contents for the resource or `RequestError`
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    func executeRequest<T>(with resource: Resource<T>) async -> Result<T, RequestError>
+    func executeRequest<T>(with resource: Resource<T>) async -> Result<T, RequestError> where T: Decodable {
     
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func executeRequestPublisher<T>(with resource: Resource<T>) -> AnyPublisher<T, RequestError> where T: Decodable
