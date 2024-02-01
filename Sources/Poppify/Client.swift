@@ -169,6 +169,11 @@ public protocol Client {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func executeRequest<T>(with resource: Resource<T>) async -> Result<T, RequestError> where T: Decodable
     
+    /// Executes a network request with the specified resource and returns a Combine publisher.
+    ///
+    /// - Parameters:
+    ///   - resource: The resource representing the network request to be executed.
+    /// - Returns: A Combine publisher that emits the result of the network request or an error.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func executeRequestPublisher<T>(with resource: Resource<T>) -> AnyPublisher<T, RequestError> where T: Decodable
     
