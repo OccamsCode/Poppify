@@ -111,3 +111,21 @@ case .failure(let error):
     print(error)
 }
 ```
+
+`Client` supports requests using `Combine`
+
+```swift
+cancellable = apiClient.executeRequest(with: userResource)
+    .sink(receiveCompletion: { completion in
+        switch completion {
+            case .finished:
+            // Handle completion
+            case .failure(let error):
+            // Handle error
+            }
+    }, receiveValue: { user in
+        // Handle successful result
+        print("Received user: \(user)")
+    }
+)
+```
