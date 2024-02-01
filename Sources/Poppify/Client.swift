@@ -311,7 +311,7 @@ public extension Client {
     ///
     /// Example usage:
     /// ```swift
-    /// cancellable = apiClient.executeRequest(with: userResource)
+    /// cancellable = apiClient.executeRequestPublisher(with: userResource)
     ///     .sink(
     ///         receiveCompletion: { completion in
     ///             switch completion {

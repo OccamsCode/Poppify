@@ -115,7 +115,7 @@ case .failure(let error):
 `Client` supports requests using `Combine`
 
 ```swift
-cancellable = apiClient.executeRequest(with: userResource)
+cancellable = apiClient.executeRequestPublisher(with: userResource)
     .sink(receiveCompletion: { completion in
         switch completion {
             case .finished:
