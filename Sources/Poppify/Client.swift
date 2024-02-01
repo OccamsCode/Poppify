@@ -152,6 +152,31 @@ public protocol Client {
     /// The session which the request is executed in
     var urlSession: URLSessionType { get }
     
+    /// Creates an object which conforms to `URLSessionTaskType` using a `Resource` and completion handler.
+    ///
+    /// By returning an object, the receiver has can dictate when the operation begins
+    /// - Parameters:
+    ///   - resource: The resource used to create the request
+    ///   - completion: The completion handler to be executed following the execution of the request
+    /// - Returns: An object which conforms to `URLSessionTaskType`
+    func executeRequest<T>(with resource: Resource<T>,
+                     completion: @escaping (Result<T, RequestError>) -> Void ) -> URLSessionTaskType? where T: Decodable
+    
+    /// Retrieves the contents for a resource and delivers the data asynchronously.
+    ///
+    /// - Parameter resource: The resource used to create the request
+    /// - Returns: An asynchronously-delivered `Result` containing the parsed contents for the resource or `RequestError`
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    func executeRequest<T>(with resource: Resource<T>) async -> Result<T, RequestError> where T: Decodable
+    
+    /// Executes a network request with the specified resource and returns a Combine publisher.
+    ///
+    /// - Parameters:
+    ///   - resource: The resource representing the network request to be executed.
+    /// - Returns: A Combine publisher that emits the result of the network request or an error.
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    func executeRequestPublisher<T>(with resource: Resource<T>) -> AnyPublisher<T, RequestError> where T: Decodable
+    
 }
 
 public extension Client {
@@ -286,7 +311,7 @@ public extension Client {
     ///
     /// Example usage:
     /// ```swift
-    /// cancellable = apiClient.executeRequest(with: userResource)
+    /// cancellable = apiClient.executeRequestPublisher(with: userResource)
     ///     .sink(
     ///         receiveCompletion: { completion in
     ///             switch completion {
@@ -308,7 +333,7 @@ public extension Client {
     /// - Important: The resource should be configured with the necessary details, such as the URL and HTTP method.
     ///              Ensure that the necessary permissions and capabilities are set for network requests.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    func executeRequest<T>(with resource: Resource<T>) -> AnyPublisher<T, RequestError> where T: Decodable {
+    func executeRequestPublisher<T>(with resource: Resource<T>) -> AnyPublisher<T, RequestError> where T: Decodable {
 
             guard let urlRequest = URLRequest(request: resource.request,
                                               in: environment) else {

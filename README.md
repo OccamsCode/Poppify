@@ -18,7 +18,7 @@ To install Poppify using [Swift Package Manager](https://github.com/apple/swift-
 or you can add the following dependency to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/OccamsCode/Poppify/", from: "1.0.2")
+.package(url: "https://github.com/OccamsCode/Poppify/", from: "1.0.5")
 ```
 
 ## Usage
@@ -110,4 +110,22 @@ case .success(let string):
 case .failure(let error):
     print(error)
 }
+```
+
+`Client` supports requests using `Combine`
+
+```swift
+cancellable = apiClient.executeRequestPublisher(with: userResource)
+    .sink(receiveCompletion: { completion in
+        switch completion {
+            case .finished:
+            // Handle completion
+            case .failure(let error):
+            // Handle error
+            }
+    }, receiveValue: { user in
+        // Handle successful result
+        print("Received user: \(user)")
+    }
+)
 ```
