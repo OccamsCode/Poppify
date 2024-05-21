@@ -77,7 +77,10 @@ public extension Requestable {
         urlComponents.host = environment.endpoint
         urlComponents.port = environment.port
         urlComponents.path = path
-        urlComponents.queryItems = parameters
+        
+        if !parameters.isEmpty {
+            urlComponents.queryItems = parameters
+        }
 
         if case let .queryItem(item) = environment.secret {
             urlComponents.queryItems?.append(item)
