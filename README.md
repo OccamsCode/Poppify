@@ -18,7 +18,7 @@ To install Poppify using [Swift Package Manager](https://github.com/apple/swift-
 or you can add the following dependency to your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/OccamsCode/Poppify/", from: "1.0.5")
+.package(url: "https://github.com/OccamsCode/Poppify/", from: "1.0.6")
 ```
 
 ## Usage
