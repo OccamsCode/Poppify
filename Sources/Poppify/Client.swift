@@ -177,6 +177,10 @@ public protocol Client {
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func executeRequestPublisher<T>(with resource: Resource<T>) -> AnyPublisher<T, RequestError> where T: Decodable
     
+    
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    func executeAsyncRequest<T>(with resource: Resource<T>) async throws -> T where T: Decodable
+    
 }
 
 public extension Client {
@@ -361,4 +365,23 @@ public extension Client {
                 .eraseToAnyPublisher()
             
         }
+    
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    func executeAsyncRequest<T>(with resource: Resource<T>) async throws -> T where T: Decodable {
+        guard let urlRequest = URLRequest(request: resource.request,
+                                          in: environment) else { throw RequestError.invalidRequest }
+        
+        let (data, response) = try await urlSession.sendRequest(for: urlRequest)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw RequestError.invalidResponse
+        }
+        
+        let statusCode = httpResponse.statusCode
+        switch statusCode {
+        case 200...299:
+            return try resource.decode(data)
+        default:
+            throw RequestError.unhandledStatusCode(statusCode)
+        }
+    }
 }
