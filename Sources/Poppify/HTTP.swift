@@ -78,11 +78,25 @@ public enum HTTP {
     
     /// A namespace for the various types of HTTP methods possible
     ///
-    ///  - GET
-    ///  - POST
-    ///  - PUT
-    ///  - DELETE
+    ///  For more information, see [HTTP request methods](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods)
     public enum Method: String {
-        case GET, POST, PUT, DELETE
+        
+        /// The `GET` method requests a representation of the specified resource. Requests using `GET` should only retrieve data.
+        case GET
+        
+        /// The `HEAD` method asks for a response identical to that of a `GET` request, but without the response body.
+        case HEAD
+        
+        /// The `POST` method submits an entity to the specified resource, often causing a change in state or side effects on the server.
+        case POST
+        
+        /// The `PUT` method replaces all current representations of the target resource with the request payload.
+        case PUT
+        
+        /// The `DELETE` method deletes the specified resource.
+        case DELETE
+        
+        /// The `PATCH` method applies partial modifications to a resource.
+        case PATCH
     }
 }
