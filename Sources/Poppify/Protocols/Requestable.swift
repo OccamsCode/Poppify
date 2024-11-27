@@ -76,7 +76,7 @@ public extension Requestable {
         urlComponents.scheme = environment.scheme.rawValue
         urlComponents.host = environment.endpoint
         urlComponents.port = environment.port
-        urlComponents.path = path
+        urlComponents.path = [environment.basePath, path].compactMap { $0 }.joined()
         
         if !parameters.isEmpty {
             urlComponents.queryItems = parameters
@@ -94,39 +94,11 @@ public extension Requestable {
 
         ⌜--------------------
         Request: \(method) - \(path)
-        Headers: \(headers.sorted(by: <).reduce("", { $0 + "\($1.key): \($1.value)," }))
+        Headers: \(headers.sorted(by: <).map { "\($0.key): \($0.value)" }.joined(separator: ","))
         Date: \(Date())
-        Parameters: \(parameters)
+        Parameters: \(parameters.map { $0.description }.joined(separator: ", "))
         ⌞--------------------
         """
     }
 
-}
-
-public extension URLRequest {
-    
-    /// Initializes a newly created URLRequest using the contents of the given request, relative to a given environment.
-    /// - Parameters:
-    ///   - request: The request used to create the URL for the URLRequest
-    ///   - environment: The environment used to create the URL and fill the relevant fields of the URLRequest
-    init?(request: Requestable, in environment: EnvironmentType) {
-
-        guard let fullURL = request.url(using: environment) else { return nil }
-        self.init(url: fullURL)
-        self.httpMethod = request.method.rawValue
-
-        request.headers.forEach { (key, value) in
-            self.setValue(value, forHTTPHeaderField: key)
-        }
-
-        environment.additionalHeaders.forEach { (key, value) in
-            self.setValue(value, forHTTPHeaderField: key)
-        }
-
-        if case let .header(key, value) = environment.secret {
-            self.setValue(value.rawValue, forHTTPHeaderField: key.rawValue)
-        }
-        
-        self.httpBody = request.body
-    }
 }

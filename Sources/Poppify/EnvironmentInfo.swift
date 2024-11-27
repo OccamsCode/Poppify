@@ -26,36 +26,6 @@
 
 import Foundation
 
-/// A value that represents a request secret either as a query item or in a HTTP header
-public enum Secret {
-    
-    /// A secret stored in a URL query item
-    case queryItem(_ item: URLQueryItem)
-    
-    /// A secret stored in a HTTP header
-    case header(_ key: HTTP.Header.Key, value: HTTP.Header.Value)
-}
-
-/// A type which represents the core values of an environment from which requests can be created within
-public protocol EnvironmentType {
-    
-    /// The scheme which the request will use
-    var scheme: HTTP.Scheme { get }
-    
-    /// The base endpoint used for the environment
-    var endpoint: String { get }
-    
-    /// Any additional headers to be sent in the request
-    var additionalHeaders: [String: String] { get }
-    
-    /// An optional port number for the request
-    var port: Int? { get }
-    
-    /// An optional secret used for the request
-    var secret: Secret? { get }
-}
-
-
 /// A simple value which conforms to `EnvironmentType` and contains a `debugDescription` for debugging purposes.
 public struct EnvironmentInfo: EnvironmentType, CustomDebugStringConvertible {
 
@@ -63,17 +33,20 @@ public struct EnvironmentInfo: EnvironmentType, CustomDebugStringConvertible {
     public let endpoint: String
     public let additionalHeaders: [String: String]
     public let port: Int?
+    public let basePath: String?
     public let secret: Secret?
 
     public init(scheme: HTTP.Scheme,
                 endpoint: String,
                 additionalHeaders: [String : String] = [:],
                 port: Int? = nil,
+                basePath: String? = nil,
                 secret: Secret? = nil) {
         self.scheme = scheme
         self.endpoint = endpoint
         self.additionalHeaders = additionalHeaders
         self.port = port
+        self.basePath = basePath
         self.secret = secret
     }
     
@@ -81,11 +54,10 @@ public struct EnvironmentInfo: EnvironmentType, CustomDebugStringConvertible {
     ///
     /// The values for `additionalHeaders` and `secret` are purposely omitted
     public var debugDescription: String {
-        var output = "\(scheme.rawValue)-\(endpoint)"
-        if let port = port {
-            output += ":\(port)"
-        }
-        return output
+        var components = ["\(scheme.rawValue)-\(endpoint)"]
+        if let port = port { components.append(":\(port)") }
+        if let basePath = basePath { components.append("/\(basePath)") }
+        return components.joined()
     }
 }
 
@@ -97,17 +69,20 @@ public struct Environment: EnvironmentType, CustomDebugStringConvertible {
     public let endpoint: String
     public let additionalHeaders: [String: String]
     public let port: Int?
+    public let basePath: String?
     public let secret: Secret?
 
     public init(scheme: HTTP.Scheme,
                 endpoint: String,
                 additionalHeaders: [String : String] = [:],
                 port: Int? = nil,
+                basePath: String? = nil,
                 secret: Secret? = nil) {
         self.scheme = scheme
         self.endpoint = endpoint
         self.additionalHeaders = additionalHeaders
         self.port = port
+        self.basePath = basePath
         self.secret = secret
     }
     

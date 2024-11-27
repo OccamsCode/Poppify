@@ -27,118 +27,6 @@
 import Foundation
 import Combine
 
-/// A type which implements the `resume()` function
-public protocol URLSessionTaskType {
-    func resume()
-}
-
-extension URLSessionDataTask: URLSessionTaskType {}
-
-/// A protocol representing a type that can perform URL session tasks.
-public protocol URLSessionType {
-    /// Creates a data task with the specified request and completion handler.
-    ///
-    /// - Parameters:
-    ///   - request: The URL request to be used in the data task.
-    ///   - completion: The completion handler to be called when the data task completes.
-    /// - Returns: A task representing the ongoing data task.
-    func dataTask(with request: URLRequest,
-                  completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionTaskType
-
-    /// Asynchronously sends a request and retrieves the data and response.
-    ///
-    /// - Parameters:
-    ///   - request: The URL request to be sent.
-    /// - Returns: A tuple containing the received data and the URL response.
-    /// - Throws: An error if the request or response processing encounters an issue.
-    ///
-    /// - Note: This function is only available on macOS 10.15, iOS 13.0, watchOS 6.0, and tvOS 13.0, and later.
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    func sendRequest(for request: URLRequest) async throws -> (Data, URLResponse)
-
-    /// Creates a Combine publisher for a request, allowing for asynchronous handling of the response.
-    ///
-    /// - Parameters:
-    ///   - request: The URL request to be used in the data task publisher.
-    /// - Returns: A Combine publisher for the data task.
-    ///
-    /// - Note: This function is only available on macOS 10.15, iOS 13.0, watchOS 6.0, and tvOS 13.0, and later.
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    func sendPublisherRequest(for request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError>
-}
-
-
-extension URLSession: URLSessionType {
-    public func dataTask(with request: URLRequest,
-                  completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionTaskType {
-        return self.dataTask(with: request, completionHandler: completion)
-    }
-    
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public func sendRequest(for request: URLRequest) async throws -> (Data, URLResponse) {
-        return try await self.data(for: request)
-    }
-    
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public func sendPublisherRequest(for request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError> {
-        return self.dataTaskPublisher(for: request).eraseToAnyPublisher()
-    }
-}
-
-/// Encapsulates various types of errors encounters when executing a request
-public enum RequestError: Error {
-    /// Uable to create a valid request
-    case invalidRequest
-    
-    /// The `Data?` object was nil
-    case invalidData
-    
-    /// The `response` object was not a `HTTPResponse` type
-    case invalidResponse
-    
-    /// Status code was not in the 2xx range
-    case unhandledStatusCode(Int)
-    
-    /// The requested errored with the given error
-    case response(error: Error)
-    
-    /// The decoding failed with the given error
-    case decode(error: Error)
-}
-
-extension RequestError: Equatable {
-    public static func == (lhs: RequestError, rhs: RequestError) -> Bool {
-        switch (lhs, rhs) {
-        case (.invalidData, .invalidData),
-            (.invalidResponse, .invalidResponse),
-            (.unhandledStatusCode(_), .unhandledStatusCode(_)),
-            (.response(_), .response(_)),
-            (.decode(_), .decode(_)):
-            return true
-        default: return false
-        }
-    }
-}
-
-extension RequestError: LocalizedError {
-    public var errorDescription: String? {
-        switch self {
-        case .invalidData:
-            return NSLocalizedString("Invalid Data", comment: "No data sent")                                           // No data sent
-        case .invalidResponse:
-            return NSLocalizedString("Invalid Response", comment: "URLResponse not HTTPURLResponse")                    // URLResponse not HTTPURLResponse
-        case .unhandledStatusCode(let code):
-            return NSLocalizedString("Invalid Response StatusCode \(code)" , comment: "Status Code not 2xx")            // Status Code not 2xx
-        case .response(let error):
-            return NSLocalizedString("Response Error \(error.localizedDescription)", comment: "Error from Request")     // Error from Request
-        case .decode(let error):
-            return NSLocalizedString("Decode Error \(error.localizedDescription)" , comment: "Error from Decoder")      // Error from Decoder
-        case .invalidRequest:
-            return NSLocalizedString("Unable to create valid request for resource in environment", comment: "Error during request creation")
-        }
-    }
-}
-
 /// Defines what a `Client` should contain.
 ///
 /// A client should contain the following;
@@ -376,6 +264,7 @@ public extension Client {
             throw RequestError.invalidResponse
         }
         
+        //return try HTTPResponseMapper.map(data: data, response: httpResponse)
         let statusCode = httpResponse.statusCode
         switch statusCode {
         case 200...299:

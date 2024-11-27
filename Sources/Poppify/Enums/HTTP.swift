@@ -32,11 +32,11 @@ public enum HTTP {
 
         /// Represents a the concept of a HTTP Header Key
         ///
-        /// Conforms to `ExpressibleByStringLiteral`, hence can be expressed using a string
+        /// Conforms to `ExpressibleByStringInterpolation`, hence can be expressed using a string
         ///
         ///     let accept: HTTP.Header.Key = "Accept"
         ///
-        public struct Key: ExpressibleByStringLiteral {
+        public struct Key: ExpressibleByStringInterpolation {
             let rawValue: String
             
             /// Creates a HTTP Header Key with the given value.
@@ -49,11 +49,11 @@ public enum HTTP {
         
         /// Represents a the concept of a HTTP Header Value
         ///
-        /// Conforms to `ExpressibleByStringLiteral`, hence can be expressed using a string
+        /// Conforms to `ExpressibleByStringInterpolation`, hence can be expressed using a string
         ///
         ///     let accept: HTTP.Header.Value = "application/json"
         ///
-        public struct Value: ExpressibleByStringLiteral {
+        public struct Value: ExpressibleByStringInterpolation {
             let rawValue: String
             
             /// Creates a HTTP Header Value with the given value.
