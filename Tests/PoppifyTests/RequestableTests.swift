@@ -131,7 +131,7 @@ final class RequestableURLTests: XCTestCase {
         
         let result = sut.url(using: environment)
         
-        XCTAssertEqual(result?.path, "/v1/mock")
+        XCTAssertEqual(result?.path, "/test/v1/mock")
     }
     
     func testCreatedURL_queryItems_containsQueryItems() throws {

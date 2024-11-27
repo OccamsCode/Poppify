@@ -34,6 +34,7 @@ struct MockSecureEnvironment: EnvironmentType {
     var endpoint: String = "api.mock.org"
     var additionalHeaders: [String : String] = ["Connection": "Close"]
     var port: Int? = 443
+    var basePath: String? = "/test"
     var secret: Secret? = .header("X-API-KEY", value: "c6fb701caa6b1fbe4290a16e77b564b8")
 }
 
@@ -42,6 +43,7 @@ struct MockUnsecureEnvironment: EnvironmentType {
     var endpoint: String = "api.mock.com"
     var additionalHeaders: [String : String] = ["Connection": "Keep-Alive"]
     var port: Int? = 80
+    var basePath: String? = "/v1"
     var secret: Secret? = .queryItem(URLQueryItem(name: "API-KEY", value: "Poppify-MD5"))
 }
 
