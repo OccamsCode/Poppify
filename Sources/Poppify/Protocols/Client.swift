@@ -35,11 +35,13 @@ import Combine
 public protocol Client {
     
     /// The environment from which the request is created inside
-    var environment: EnvironmentType { get }
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    var environment: EnvironmentType { get async }
     
     /// The session which the request is executed in
     var urlSession: URLSessionType { get }
     
+    /*
     /// Creates an object which conforms to `URLSessionTaskType` using a `Resource` and completion handler.
     ///
     /// By returning an object, the receiver has can dictate when the operation begins
@@ -64,7 +66,7 @@ public protocol Client {
     /// - Returns: A Combine publisher that emits the result of the network request or an error.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func executeRequestPublisher<T>(with resource: Resource<T>) -> AnyPublisher<T, RequestError> where T: Decodable
-    
+    */
     
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func executeAsyncRequest<T>(with resource: Resource<T>) async throws -> T where T: Decodable
@@ -72,7 +74,7 @@ public protocol Client {
 }
 
 public extension Client {
-    
+    /*
     /// Executes a network request with the specified resource using a completion handler.
     ///
     /// - Parameters:
@@ -253,10 +255,11 @@ public extension Client {
                 .eraseToAnyPublisher()
             
         }
+    */
     
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func executeAsyncRequest<T>(with resource: Resource<T>) async throws -> T where T: Decodable {
-        guard let urlRequest = URLRequest(request: resource.request,
+        guard let urlRequest = await URLRequest(request: resource.request,
                                           in: environment) else { throw RequestError.invalidRequest }
         
         let (data, response) = try await urlSession.sendRequest(for: urlRequest)

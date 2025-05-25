@@ -31,8 +31,7 @@ public typealias HTTPClientResponse = (Data, HTTPURLResponse)
 public protocol HTTPClientType {
     
     /// The environment in which the HTTP client operates, containing base URLs and other configurations.
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    var environment: EnvironmentType { get async }
+    var environment: EnvironmentType { get }
     
     /// The session in which the request is executed. This session is responsible for managing HTTP tasks and connections.
     var urlSession: URLSessionType { get }
