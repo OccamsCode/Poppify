@@ -29,6 +29,7 @@ import Foundation
 
 /// A protocol representing a type that can perform URL session tasks.
 public protocol URLSessionType {
+    /*
     /// Creates a data task with the specified request and completion handler.
     ///
     /// - Parameters:
@@ -37,7 +38,17 @@ public protocol URLSessionType {
     /// - Returns: A task representing the ongoing data task.
     func dataTask(with request: URLRequest,
                   completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionTaskType
-
+    
+    /// Creates a Combine publisher for a request, allowing for asynchronous handling of the response.
+    ///
+    /// - Parameters:
+    ///   - request: The URL request to be used in the data task publisher.
+    /// - Returns: A Combine publisher for the data task.
+    ///
+    /// - Note: This function is only available on macOS 10.15, iOS 13.0, watchOS 6.0, and tvOS 13.0, and later.
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    func sendPublisherRequest(for request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError>
+*/
     /// Asynchronously sends a request and retrieves the data and response.
     ///
     /// - Parameters:
@@ -48,14 +59,4 @@ public protocol URLSessionType {
     /// - Note: This function is only available on macOS 10.15, iOS 13.0, watchOS 6.0, and tvOS 13.0, and later.
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     func sendRequest(for request: URLRequest) async throws -> (Data, URLResponse)
-
-    /// Creates a Combine publisher for a request, allowing for asynchronous handling of the response.
-    ///
-    /// - Parameters:
-    ///   - request: The URL request to be used in the data task publisher.
-    /// - Returns: A Combine publisher for the data task.
-    ///
-    /// - Note: This function is only available on macOS 10.15, iOS 13.0, watchOS 6.0, and tvOS 13.0, and later.
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    func sendPublisherRequest(for request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError>
 }

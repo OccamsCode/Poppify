@@ -28,18 +28,21 @@ import Combine
 import Foundation
 
 extension URLSession: URLSessionType {
+    /*
     public func dataTask(with request: URLRequest,
                   completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionTaskType {
         return self.dataTask(with: request, completionHandler: completion)
     }
     
     @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public func sendRequest(for request: URLRequest) async throws -> (Data, URLResponse) {
-        return try await self.data(for: request)
-    }
-    
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
     public func sendPublisherRequest(for request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError> {
         return self.dataTaskPublisher(for: request).eraseToAnyPublisher()
     }
+    */
+    
+    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+    public func sendRequest(for request: URLRequest) async throws -> (Data, URLResponse) {
+        return try await self.data(for: request)
+    }
+
 }

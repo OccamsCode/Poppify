@@ -41,7 +41,7 @@ public protocol AsyncHTTPClient: HTTPClientType {
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public extension AsyncHTTPClient {
     func asyncRequest(with request: Requestable) async throws -> HTTPClientResponse {
-        guard let urlRequest = URLRequest(request: request, in: environment) else { throw RequestError.invalidRequest }
+        guard let urlRequest = await URLRequest(request: request, in: environment) else { throw RequestError.invalidRequest }
         
         let (data, response) = try await urlSession.sendRequest(for: urlRequest)
         
@@ -52,6 +52,7 @@ public extension AsyncHTTPClient {
     }
 }
 
+/*
 public protocol ClosureHTTPClient: HTTPClientType {
     /// Executes a network request with the specified resource and returns the result asynchronously via a completion handler.
     ///
@@ -127,3 +128,4 @@ public extension CombineHTTPClient {
             .eraseToAnyPublisher()
     }
 }
+*/
