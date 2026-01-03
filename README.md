@@ -1,96 +1,126 @@
 # Poppify
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-leafgreen.svg)](https://opensource.org/licenses/MIT) [![Package Build & Test](https://github.com/OccamsCode/Poppify/actions/workflows/build.yml/badge.svg)](https://github.com/OccamsCode/Poppify/actions/workflows/build.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-leafgreen.svg)](https://opensource.org/licenses/MIT)
+[![Package Build & Test](https://github.com/OccamsCode/Poppify/actions/workflows/build.yml/badge.svg)](https://github.com/OccamsCode/Poppify/actions/workflows/build.yml)
 
-### What is Poppify?
+## Overview
 
-A simple Protocol based networking framework  written in [Swift](https://developer.apple.com/swift/) programming language.
+Poppify is a lightweight, protocol-oriented networking framework implemented in the Swift programming language. It is designed to provide a flexible and extensible abstraction over HTTP networking, supporting multiple asynchronous paradigms while maintaining a clear separation of concerns.
 
-## Installing Poppify
+The framework emphasises composability through protocols, enabling developers to define environments, requests, and clients independently.
+
+## Installation
 
 ### Swift Package Manager
 
-To install Poppify using [Swift Package Manager](https://github.com/apple/swift-package-manager) you can follow the [tutorial published by Apple](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app) using the URL for the Poopify repo with the current version:
+Poppify can be integrated into your project using Swift Package Manager (SPM). Apple provides an official guide on adding package dependencies, which can be found here:
+https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app
 
-1. In Xcode, select “File” → “Add Packages...”
-1. Enter https://github.com/OccamsCode/Poppify
+To install Poppify via Xcode:
 
-or you can add the following dependency to your `Package.swift`:
+1. Open Xcode and select **File → Add Packages...**
+2. Enter the repository URL:
+   
+   https://github.com/OccamsCode/Poppify
+
+Alternatively, you may add Poppify directly to your `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/OccamsCode/Poppify/", from: "1.0.6")
+.package(url: "https://github.com/OccamsCode/Poppify/", from: "1.1.0")
 ```
 
 ## Usage
 
-1. [Create the Environment](#create-the-environment)
-2. [Create the Request](#create-the-request)
-3. [Create the Resource](#create-the-resource)
-4. [Create the Client](#create-the-client)
-5. [Execute the Request](#execute-the-request)
+A typical Poppify workflow consists of the following steps:
 
-### Create the Environment
+1. [Create an environment](#create-an-environment)
+2. [Define a request](#define-a-request)
+3. [Configure a client](#configure-a-client)
+4. [Execute the request](#execute-the-request)
 
-The `EnvironmentType` protocol represents various aspects of an environment such as; base endpoint, port, HTTP/HTTPS and whether the api secret sent in the header or as a query item.
+Each step is described in detail below.
 
-The existing `EnvironmentInfo` type, which simply conforms to `EnvironmentType`, can be used or a custom environment can be created
+### Creating an Environment
+
+The `EnvironmentType` protocol defines the characteristics of a network environment, including:
+
+- Base endpoint
+- Network scheme (HTTP or HTTPS)
+- Port configuration
+- Additional HTTP headers
+- API secret handling (header or query parameter)
+
+Poppify provides a concrete implementation, `EnvironmentInfo`, which satisfies `EnvironmentType` and can be used directly. Custom environments may also be defined by conforming to the protocol.
 
 ```swift
-let testEnvironment = EnvironmentInfo(scheme: .secure,
-                                    endpoint: "jsonplaceholder.typicode.com",
-                                    additionalHeaders: [:],
-                                    port: nil,
-                                    secret: .header("apiKey", value: "some_api_key"))
+let testEnvironment = EnvironmentInfo(
+    scheme: .secure,
+    endpoint: "jsonplaceholder.typicode.com",
+    additionalHeaders: [:],
+    port: nil,
+    secret: .header("apiKey", value: "some_api_key")
+)
 
 struct CustomEnvironment: EnvironmentType {
     ...
 }
 ```
 
-### Create the Request
+### Creating a Request
 
-The `Requestable` protocol represents aspects of a request to be execute in an environment such as; method, path, headers & body
+Requests are defined by conforming to the `Requestable` protocol. This protocol encapsulates the properties required to execute a request within a given environment, such as:
+
+- HTTP method
+- Request path
+- Headers
+- Request body
 
 ```swift
-struct CustomRequest: Requestable {
-    var path: String
+struct GetPostsRequest: Requestable {
+    let path: String = "/posts"
+    let parameters: [URLQueryItem]
+    
+    init(userId: String) {
+        self.parameters = [
+            URLQueryItem(name: "userId", value: userId)
+        ]
+    }
 }
 
-let request = CustomRequest(path: "/posts")
+let request = GetPostsRequest(userId: "1")
 ```
 
-### Create the Resource
+### Creating a Client
 
-A `Resource` encapsulates a request it's decoding strategy.
+Clients are responsible for executing requests against a specified environment using a provided `URLSession`. Poppify supports three client variants, each aligned with a different asynchronous programming model:
 
-When the decoding type is `Decodable`, the decoding strategy attempts to use the provided `JSONParser`
-
-```swift
-let resource = Resource<String>(request: request)
-```
-
-### Create the Client
-
-A `Client` executes a `Resource` with a given `Environment` and `URLSession`
+- `HTTPClient` – Closure-based execution
+- `CombineHTTPClient` – Combine framework support
+- `AsyncHTTPClient` – Swift concurrency (`async/await`)
 
 ```swift
-struct CustomClient: Client {
+struct CustomAsyncClient: AsyncHTTPClient {
     var environment: EnvironmentType
     var urlSession: URLSessionType
 }
 
-let task = CustomClient(environment: testEnvironment, urlSession: URLSession.shared)
+let client = CustomAsyncClient(
+    environment: testEnvironment,
+    urlSession: URLSession.shared
+)
 ```
 
-### Execute the Request
+### Executing a Request
 
-`Client` supports requests using closures 
+#### Closure-Based Execution
+
+For clients conforming to `HTTPClient`, requests can be executed using completion handlers:
 
 ```swift
-let task = client.executeRequest(with: resource) { result in
+let task = client.executeRequest(with: request) { result in
     switch result {
-    case .success(let string):
-        print(string)
+    case .success(let data, let response):
+        print("Received data: \(data)")
     case .failure(let error):
         print(error)
     }
@@ -99,33 +129,32 @@ let task = client.executeRequest(with: resource) { result in
 task?.resume()
 ```
 
-`Client` supports requests using `async/await`
+#### Swift Concurrency (`async/await`)
+
+Clients that support Swift concurrency may execute requests using `async/await` syntax:
 
 ```swift
-let result = await client.executeRequest(with: resource)
-
-switch result {
-case .success(let string):
-    print(string)
-case .failure(let error):
-    print(error)
-}
+let (data, response) = try await client.asyncRequest(with: request)
 ```
 
-`Client` supports requests using `Combine`
+#### Combine
+
+For Combine-based clients, requests are exposed as publishers:
 
 ```swift
-cancellable = apiClient.executeRequestPublisher(with: userResource)
-    .sink(receiveCompletion: { completion in
-        switch completion {
+cancellable = apiClient.publisherRequest(with: request)
+    .sink(
+        receiveCompletion: { completion in
+            switch completion {
             case .finished:
-            // Handle completion
+                // Handle successful completion
             case .failure(let error):
-            // Handle error
+                // Handle error
             }
-    }, receiveValue: { user in
-        // Handle successful result
-        print("Received user: \(user)")
-    }
-)
+        },
+        receiveValue: { result in
+            let (data, response) = result
+            print("Received data: \(data)")
+        }
+    )
 ```
