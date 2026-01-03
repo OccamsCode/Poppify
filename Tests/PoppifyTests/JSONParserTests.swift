@@ -37,8 +37,12 @@ final class JSONParserTests: XCTestCase {
         
         wait(for: [expecation], timeout: 0.1)
         
-        XCTAssertEqual(result, ParserError.jsonDecodeError)
-        
+        switch result {
+        case .jsonDecodeError:
+            break
+        default:
+            XCTFail()
+        }
     }
     
     func test_closureParser_ValidData_NoError() {

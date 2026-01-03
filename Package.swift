@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "Poppify",
-    platforms: [.iOS(.v11), .macOS(.v10_14), .tvOS(.v12), .watchOS(.v5)],
+    platforms: [.iOS(.v13), .macOS(.v10_14), .tvOS(.v12), .watchOS(.v5)],
     products: [
         .library(
             name: "Poppify",

@@ -27,19 +27,32 @@
 import Combine
 import Foundation
 
+public typealias DataResponse = (data: Data, response: URLResponse)
+
+// MARK: - URLSessionType
 extension URLSession: URLSessionType {
-    public func dataTask(with request: URLRequest,
-                  completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionTaskType {
+    public func dataTask(
+        with request: URLRequest,
+        completion: @escaping (Data?, URLResponse?, Error?) -> Void
+    ) -> URLSessionTaskType {
         return self.dataTask(with: request, completionHandler: completion)
     }
     
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public func sendRequest(for request: URLRequest) async throws -> (Data, URLResponse) {
-        return try await self.data(for: request)
-    }
-    
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    public func sendPublisherRequest(for request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError> {
+}
+
+// MARK: - CombineURLSessionType
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+extension URLSession: CombineURLSessionType {
+    public func sendPublisherRequest(for request: URLRequest) -> AnyPublisher<DataResponse, URLError> {
         return self.dataTaskPublisher(for: request).eraseToAnyPublisher()
     }
+}
+
+// MARK: - AsyncURLSessionType
+@available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
+extension URLSession: AsyncURLSessionType {
+    public func asyncData(for request: URLRequest) async throws -> DataResponse {
+        return try await self.data(for: request)
+    }
+
 }

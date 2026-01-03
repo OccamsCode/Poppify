@@ -26,17 +26,6 @@
 
 import Foundation
 
-/// Encapsulates an error when decoding a json in to a `Decodable` object
-public enum ParserError: Error {
-    case jsonDecodeError
-
-    var localizedDescription: String {
-        switch self {
-        case .jsonDecodeError: return "JSON Decoding Error"
-        }
-    }
-}
-
 /// A type that can decode binary data into objects which conform to `Decodable`
 public protocol Parser {
     
@@ -56,9 +45,11 @@ public protocol Parser {
     ///   - data: The  JSON object to be decoded.
     ///   - type: The type of the value to decode from the supplied JSON object.
     ///   - completion: A `Result` indicating the decoding was successful or failed.
-    func parse<T>(_ data: Data,
-                  into type: T.Type,
-                  completion: @escaping (Result<T, ParserError>) -> Void) where T: Decodable
+    func parse<T>(
+        _ data: Data,
+        into type: T.Type,
+        completion: @escaping (Result<T, ParserError>) -> Void
+    ) where T: Decodable
 }
 
 /// A simple implementation of a JSON parser
@@ -79,21 +70,25 @@ public class JSONParser: Parser {
         self.dateDecodingStrategy = dateDecodingStrategy
     }
 
-    public func parse<T>(_ data: Data,
-                  into type: T.Type) throws -> T where T: Decodable {
+    public func parse<T>(
+        _ data: Data,
+        into type: T.Type
+    ) throws -> T where T: Decodable {
         decoder.dateDecodingStrategy = dateDecodingStrategy
         return try decoder.decode(T.self, from: data)
     }
 
-    public func parse<T>(_ data: Data,
-                  into type: T.Type,
-                  completion: @escaping (Result<T, ParserError>) -> Void) where T: Decodable {
+    public func parse<T>(
+        _ data: Data,
+        into type: T.Type,
+        completion: @escaping (Result<T, ParserError>) -> Void
+    ) where T: Decodable {
         decoder.dateDecodingStrategy = dateDecodingStrategy
         do {
             let result = try decoder.decode(T.self, from: data)
             completion(.success(result))
         } catch {
-            completion(.failure(.jsonDecodeError))
+            completion(.failure(.jsonDecodeError(error)))
         }
     }
 

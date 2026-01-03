@@ -35,27 +35,8 @@ public protocol URLSessionType {
     ///   - request: The URL request to be used in the data task.
     ///   - completion: The completion handler to be called when the data task completes.
     /// - Returns: A task representing the ongoing data task.
-    func dataTask(with request: URLRequest,
-                  completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionTaskType
-
-    /// Asynchronously sends a request and retrieves the data and response.
-    ///
-    /// - Parameters:
-    ///   - request: The URL request to be sent.
-    /// - Returns: A tuple containing the received data and the URL response.
-    /// - Throws: An error if the request or response processing encounters an issue.
-    ///
-    /// - Note: This function is only available on macOS 10.15, iOS 13.0, watchOS 6.0, and tvOS 13.0, and later.
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    func sendRequest(for request: URLRequest) async throws -> (Data, URLResponse)
-
-    /// Creates a Combine publisher for a request, allowing for asynchronous handling of the response.
-    ///
-    /// - Parameters:
-    ///   - request: The URL request to be used in the data task publisher.
-    /// - Returns: A Combine publisher for the data task.
-    ///
-    /// - Note: This function is only available on macOS 10.15, iOS 13.0, watchOS 6.0, and tvOS 13.0, and later.
-    @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
-    func sendPublisherRequest(for request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError>
+    func dataTask(
+        with request: URLRequest,
+        completion: @escaping (Data?, URLResponse?, Error?) -> Void
+    ) -> URLSessionTaskType
 }

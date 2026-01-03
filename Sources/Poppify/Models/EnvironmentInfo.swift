@@ -36,12 +36,14 @@ public struct EnvironmentInfo: EnvironmentType, CustomDebugStringConvertible {
     public let basePath: String?
     public let secret: Secret?
 
-    public init(scheme: HTTP.Scheme,
-                endpoint: String,
-                additionalHeaders: [String : String] = [:],
-                port: Int? = nil,
-                basePath: String? = nil,
-                secret: Secret? = nil) {
+    public init(
+        scheme: HTTP.Scheme,
+        endpoint: String,
+        additionalHeaders: [String : String] = [:],
+        port: Int? = nil,
+        basePath: String? = nil,
+        secret: Secret? = nil
+    ) {
         self.scheme = scheme
         self.endpoint = endpoint
         self.additionalHeaders = additionalHeaders
@@ -72,12 +74,14 @@ public struct Environment: EnvironmentType, CustomDebugStringConvertible {
     public let basePath: String?
     public let secret: Secret?
 
-    public init(scheme: HTTP.Scheme,
-                endpoint: String,
-                additionalHeaders: [String : String] = [:],
-                port: Int? = nil,
-                basePath: String? = nil,
-                secret: Secret? = nil) {
+    public init(
+        scheme: HTTP.Scheme,
+        endpoint: String,
+        additionalHeaders: [String : String] = [:],
+        port: Int? = nil,
+        basePath: String? = nil,
+        secret: Secret? = nil
+    ) {
         self.scheme = scheme
         self.endpoint = endpoint
         self.additionalHeaders = additionalHeaders

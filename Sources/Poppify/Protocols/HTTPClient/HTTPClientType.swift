@@ -26,7 +26,7 @@
 
 import Foundation
 
-public typealias HTTPClientResponse = (Data, HTTPURLResponse)
+public typealias HTTPClientResponse = (data: Data, httpURLResponse: HTTPURLResponse)
 
 public protocol HTTPClientType {
     
