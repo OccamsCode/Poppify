@@ -81,30 +81,26 @@ final class MockResponse {
 }
 
 // MARK: - URLSession
-final class MockURLSession: URLSessionType {
-
+final class MockURLSession {
+    
     var data: Data?
     var response: URLResponse?
     var error: Error?
+    
+}
 
+extension MockURLSession: URLSessionType {
     func dataTask(with request: URLRequest,
                   completion: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionTaskType {
         return MockTask {
             completion(self.data, self.response, self.error)
         }
     }
+}
 
+extension MockURLSession: CombineURLSessionType {
     @available(iOS 13.0.0, *)
-    func sendRequest(for request: URLRequest) async throws -> (Data, URLResponse) {
-        if let error = error { throw error }
-        guard let data = data, let response = response else {
-            throw RequestError.invalidRequest
-        }
-        return (data, response)
-    }
-    
-    @available(iOS 13.0.0, *)
-    func sendPublisherRequest(for request: URLRequest) -> AnyPublisher<(data: Data, response: URLResponse), URLError> {
+    func sendPublisherRequest(for request: URLRequest) -> AnyPublisher<DataResponse, URLError> {
         if error != nil {
             return Fail(error: URLError(.init(rawValue: 300)))
                 .eraseToAnyPublisher()
@@ -120,16 +116,47 @@ final class MockURLSession: URLSessionType {
     }
 }
 
+extension MockURLSession: AsyncURLSessionType {
+    @available(iOS 13.0.0, *)
+    func asyncData(for request: URLRequest) async throws -> DataResponse {
+        if let error = error { throw error }
+        guard let data = data, let response = response else {
+            throw RequestError.invalidRequest
+        }
+        return (data, response)
+    }
+}
+
 // MARK: - Client
-enum MockError: Error {
+enum MockError: Error, Equatable {
     case err
 }
 
-final class MockClient: Client {
+final class MockHTTPClient: HTTPClient {
     var environment: EnvironmentType
     var urlSession: URLSessionType
     
     init(_ environment: EnvironmentType, session: URLSessionType) {
+        self.environment = environment
+        self.urlSession = session
+    }
+}
+
+final class MockCombineHTTPClient: CombineHTTPClient {
+    var environment: EnvironmentType
+    var urlSession: CombineURLSessionType
+    
+    init(_ environment: EnvironmentType, session: CombineURLSessionType) {
+        self.environment = environment
+        self.urlSession = session
+    }
+}
+
+final class MockAsyncHTTPClient: AsyncHTTPClient {
+    var environment: EnvironmentType
+    var urlSession: AsyncURLSessionType
+    
+    init(_ environment: EnvironmentType, session: AsyncURLSessionType) {
         self.environment = environment
         self.urlSession = session
     }
