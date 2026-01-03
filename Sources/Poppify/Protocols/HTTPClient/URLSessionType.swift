@@ -1,10 +1,10 @@
 //
-//    HTTPClientType.swift
+//    URLSessionType.swift
 //    Poppify
 //
-//    Created by Brian Munjoma on 18/11/2024.
+//    Created by Brian Munjoma on 15/11/2024.
 //
-//    Copyright (c) 2023 Brian Munjoma
+//    Copyright (c) 2024 Brian Munjoma
 //
 //    Permission is hereby granted, free of charge, to any person obtaining a copy
 //    of this software and associated documentation files (the "Software"), to deal
@@ -24,15 +24,19 @@
 //    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //    SOFTWARE.
 
+import Combine
 import Foundation
 
-public typealias HTTPClientResponse = (data: Data, httpURLResponse: HTTPURLResponse)
-
-public protocol HTTPClientType {
-    
-    /// The environment in which the HTTP client operates, containing base URLs and other configurations.
-    var environment: EnvironmentType { get }
-    
-    /// The session in which the request is executed. This session is responsible for managing HTTP tasks and connections.
-    var urlSession: URLSessionType { get }
+/// A protocol representing a type that can perform URL session tasks.
+public protocol URLSessionType {
+    /// Creates a data task with the specified request and completion handler.
+    ///
+    /// - Parameters:
+    ///   - request: The URL request to be used in the data task.
+    ///   - completion: The completion handler to be called when the data task completes.
+    /// - Returns: A task representing the ongoing data task.
+    func dataTask(
+        with request: URLRequest,
+        completion: @escaping (Data?, URLResponse?, Error?) -> Void
+    ) -> URLSessionTaskType
 }

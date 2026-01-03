@@ -24,36 +24,9 @@
 //    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //    SOFTWARE.
 
-import Combine
 import Foundation
 
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-public protocol AsyncHTTPClient: HTTPClientType {
-    /// Executes a network request with the specified resource and returns a Combine publisher.
-    ///
-    /// - Parameters:
-    ///   - request: The resource representing the network request to be executed.
-    /// - Returns: An HTTPClientResponse containing the result of the network request.
-    /// - Throws: An error if the network request fails.
-    func asyncRequest(with request: Requestable) async throws -> HTTPClientResponse
-}
-
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-public extension AsyncHTTPClient {
-    func asyncRequest(with request: Requestable) async throws -> HTTPClientResponse {
-        guard let urlRequest = URLRequest(request: request, in: environment) else { throw RequestError.invalidRequest }
-        
-        let (data, response) = try await urlSession.sendRequest(for: urlRequest)
-        
-        guard let httpURLResponse = response as? HTTPURLResponse else {
-            throw RequestError.invalidResponse
-        }
-        return (data, httpURLResponse)
-    }
-}
-
-/*
-public protocol ClosureHTTPClient: HTTPClientType {
+public protocol HTTPClient: HTTPClientType {
     /// Executes a network request with the specified resource and returns the result asynchronously via a completion handler.
     ///
     /// - Parameters:
@@ -66,9 +39,11 @@ public protocol ClosureHTTPClient: HTTPClientType {
     ) -> URLSessionTaskType?
 }
 
-public extension ClosureHTTPClient {
-    func executeRequest(with request: Requestable,
-                        completion: @escaping (Result<HTTPClientResponse, Error>) -> Void ) -> URLSessionTaskType? {
+public extension HTTPClient {
+    func executeRequest(
+        with request: Requestable,
+        completion: @escaping (Result<HTTPClientResponse, Error>) -> Void
+    ) -> URLSessionTaskType? {
         
         guard let urlRequest = URLRequest(request: request, in: environment) else {
             completion(.failure(RequestError.invalidRequest))
@@ -95,37 +70,3 @@ public extension ClosureHTTPClient {
     }
     
 }
-
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-public protocol CombineHTTPClient: HTTPClientType {
-    /// Executes a network request with the specified resource and returns a Combine publisher.
-    ///
-    /// - Parameter request: The resource representing the network request to be executed.
-    /// - Returns: A Combine publisher that emits `HTTPClientResponse` on success or an error on failure.
-    func publisherRequest(with request: Requestable) -> AnyPublisher<HTTPClientResponse, Error>
-}
-
-@available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-public extension CombineHTTPClient {
-    func publisherRequest(with request: Requestable) -> AnyPublisher<HTTPClientResponse, Error> {
-        guard let urlRequest = URLRequest(request: request,
-                                          in: environment) else {
-            return Fail(error: RequestError.invalidRequest)
-                .eraseToAnyPublisher()
-        }
-        
-        return urlSession.sendPublisherRequest(for: urlRequest)
-            .tryMap { (data, response) in
-                guard let httpResponse = response as? HTTPURLResponse else {
-                    throw RequestError.invalidResponse
-                }
-                
-                return (data, httpResponse)
-            }
-            .mapError {
-                RequestError.response(error: $0)
-            }
-            .eraseToAnyPublisher()
-    }
-}
-*/

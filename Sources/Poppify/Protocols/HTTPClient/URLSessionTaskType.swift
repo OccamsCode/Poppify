@@ -1,8 +1,8 @@
 //
-//    HTTPClientType.swift
+//    URLSessionTaskType.swift
 //    Poppify
 //
-//    Created by Brian Munjoma on 18/11/2024.
+//    Created by Brian Munjoma on 15/11/2024.
 //
 //    Copyright (c) 2023 Brian Munjoma
 //
@@ -26,13 +26,7 @@
 
 import Foundation
 
-public typealias HTTPClientResponse = (data: Data, httpURLResponse: HTTPURLResponse)
-
-public protocol HTTPClientType {
-    
-    /// The environment in which the HTTP client operates, containing base URLs and other configurations.
-    var environment: EnvironmentType { get }
-    
-    /// The session in which the request is executed. This session is responsible for managing HTTP tasks and connections.
-    var urlSession: URLSessionType { get }
+/// A type which implements the `resume()` function
+public protocol URLSessionTaskType {
+    func resume()
 }
