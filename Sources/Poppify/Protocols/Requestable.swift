@@ -59,6 +59,11 @@ public protocol Requestable: CustomDebugStringConvertible {
     ///
     ///     var body: Data? { return nil }
     var body: Data? { get }
+
+    /// Attempts to create a URL for this `Requestable` within the given environment.
+    /// - Parameter environment: The environment used to construct the base URL
+    /// - Returns: A valid URL if all components are well-formed, otherwise `nil`
+    func url(using environment: EnvironmentType) -> URL?
 }
 
 public extension Requestable {
@@ -67,12 +72,6 @@ public extension Requestable {
     var headers: [String: String] { return [:] }
     var body: Data? { return nil }
     
-    /// Attempts to create a URL for the `Requestable` object within the given environment.
-    /// - Parameter environment: The environment used to create the URL
-    /// - Returns: A valid URL object if the `Requestable` and `EnvironmentType` contain correct values, otherwise `nil`
-    ///
-    /// The final URL path is formed by joining `environment.basePath` and `path`.
-    /// If `environment.secret` is a `.queryItem`, it is appended to the query string.
     func url(using environment: EnvironmentType) -> URL? {
         var urlComponents = URLComponents()
 

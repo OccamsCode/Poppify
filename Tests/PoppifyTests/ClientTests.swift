@@ -9,13 +9,9 @@ import Combine
 import XCTest
 @testable import Poppify
 
-private struct MockBadEnvironment: EnvironmentType {
-    var scheme: HTTP.Scheme = .secure
-    var endpoint: String = "invalid host"
-    var additionalHeaders: [String: String] = [:]
-    var port: Int? = nil
-    var basePath: String? = nil
-    var secret: Secret? = nil
+private struct MockInvalidRequestable: Requestable {
+    let path: String = "/path"
+    func url(using environment: EnvironmentType) -> URL? { return nil }
 }
 
 @available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *)
@@ -94,12 +90,12 @@ final class HTTPClientTests: XCTestCase {
     }
 
     func test_HTTPClient_InvalidURL_ReturnsInvalidRequestError() {
-        let badSut = MockHTTPClient(MockBadEnvironment(), session: session)
+        let invalidRequest = MockInvalidRequestable()
 
         let exp = expectation(description: "HTTPClient invalid URL")
         var receivedError: RequestError?
 
-        let task = badSut.executeRequest(with: request) { result in
+        let task = sut.executeRequest(with: invalidRequest) { result in
             if case .failure(let error) = result { receivedError = error as? RequestError }
             exp.fulfill()
         }
@@ -185,12 +181,12 @@ final class CombineHTTPClientTests: XCTestCase {
     }
 
     func test_CombineClient_InvalidURL_ReturnsInvalidRequestError() {
-        let badSut = MockCombineHTTPClient(MockBadEnvironment(), session: session)
+        let invalidRequest = MockInvalidRequestable()
 
         let exp = expectation(description: "CombineClient invalid URL")
         var receivedError: RequestError?
 
-        badSut.publisherRequest(with: request)
+        sut.publisherRequest(with: invalidRequest)
             .sink(receiveCompletion: { completion in
                 if case .failure(let error) = completion { receivedError = error as? RequestError }
                 exp.fulfill()
