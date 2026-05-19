@@ -72,9 +72,58 @@ final class SecureEnvironmentURLRequestTest: XCTestCase {
 
         XCTAssertEqual(result.httpMethod, "HEAD")
     }
+
+    func testCreateURLRequest_headerPrecedence_environmentOverRequest_environmentWins() throws {
+        let result = try XCTUnwrap(
+            URLRequest(request: MockConflictRequest(), in: MockConflictEnvironment(), headerPrecedence: .environmentOverRequest)
+        )
+        XCTAssertEqual(result.value(forHTTPHeaderField: "X-Source"), "environment")
+    }
+
+    func testCreateURLRequest_headerPrecedence_requestOverEnvironment_requestWins() throws {
+        let result = try XCTUnwrap(
+            URLRequest(request: MockConflictRequest(), in: MockConflictEnvironment(), headerPrecedence: .requestOverEnvironment)
+        )
+        XCTAssertEqual(result.value(forHTTPHeaderField: "X-Source"), "request")
+    }
+
+    func testCreateURLRequest_secretHeader_alwaysWinsRegardlessOfPrecedence() throws {
+        let result = try XCTUnwrap(
+            URLRequest(request: MockSecretConflictRequest(), in: MockSecretEnvironment(), headerPrecedence: .requestOverEnvironment)
+        )
+        XCTAssertEqual(result.value(forHTTPHeaderField: "X-API-KEY"), "from-secret")
+    }
 }
 
 private struct MockHeadRequest: Requestable {
     let path: String
     var method: HTTP.Method { .HEAD }
+}
+
+private struct MockConflictRequest: Requestable {
+    let path: String = "/path"
+    var headers: [String: String] { ["X-Source": "request"] }
+}
+
+private struct MockConflictEnvironment: EnvironmentType {
+    var scheme: HTTP.Scheme = .secure
+    var endpoint: String = "api.mock.org"
+    var additionalHeaders: [String: String] = ["X-Source": "environment"]
+    var port: Int? = nil
+    var basePath: String? = nil
+    var secret: Secret? = nil
+}
+
+private struct MockSecretConflictRequest: Requestable {
+    let path: String = "/path"
+    var headers: [String: String] { ["X-API-KEY": "from-request"] }
+}
+
+private struct MockSecretEnvironment: EnvironmentType {
+    var scheme: HTTP.Scheme = .secure
+    var endpoint: String = "api.mock.org"
+    var additionalHeaders: [String: String] = [:]
+    var port: Int? = nil
+    var basePath: String? = nil
+    var secret: Secret? = .header("X-API-KEY", value: "from-secret")
 }
