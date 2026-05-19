@@ -32,7 +32,9 @@ public protocol EnvironmentType {
     /// The scheme which the request will use
     var scheme: HTTP.Scheme { get }
     
-    /// The base endpoint used for the environment
+    /// The hostname for the environment, e.g. `"api.example.com"`
+    ///
+    /// Must be a bare hostname only — no scheme, port, or path component.
     var endpoint: String { get }
     
     /// Any additional headers to be sent in the request

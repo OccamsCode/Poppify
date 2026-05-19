@@ -10,6 +10,9 @@ import Foundation
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public protocol AsyncHTTPClientType {
     /// The environment in which the HTTP client operates, containing base URLs and other configurations.
+    ///
+    /// Marked `async` to allow conforming types to resolve the environment asynchronously if needed.
+    /// Non-async stored properties satisfy this requirement automatically.
     var environment: EnvironmentType { get async }
     
     /// The session in which the request is executed. This session is responsible for managing HTTP tasks and connections.
