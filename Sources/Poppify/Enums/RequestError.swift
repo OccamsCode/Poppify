@@ -30,31 +30,24 @@ import Foundation
 public enum RequestError: Error {
     /// Uable to create a valid request
     case invalidRequest
-    
+
     /// The `Data?` object was nil
     case invalidData
-    
+
     /// The `response` object was not a `HTTPResponse` type
     case invalidResponse
-    
-    /// Status code was not in the 2xx range
-    case unhandledStatusCode(Int)
-    
+
     /// The requested errored with the given error
     case response(error: Error)
-    
-    /// The decoding failed with the given error
-    case decode(error: Error)
 }
 
 extension RequestError: Equatable {
     public static func == (lhs: RequestError, rhs: RequestError) -> Bool {
         switch (lhs, rhs) {
-        case (.invalidData, .invalidData),
+        case (.invalidRequest, .invalidRequest),
+            (.invalidData, .invalidData),
             (.invalidResponse, .invalidResponse),
-            (.unhandledStatusCode(_), .unhandledStatusCode(_)),
-            (.response(_), .response(_)),
-            (.decode(_), .decode(_)):
+            (.response(_), .response(_)):
             return true
         default: return false
         }
@@ -65,15 +58,11 @@ extension RequestError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .invalidData:
-            return NSLocalizedString("Invalid Data", comment: "No data sent")                                           // No data sent
+            return NSLocalizedString("Invalid Data", comment: "No data sent")
         case .invalidResponse:
-            return NSLocalizedString("Invalid Response", comment: "URLResponse not HTTPURLResponse")                    // URLResponse not HTTPURLResponse
-        case .unhandledStatusCode(let code):
-            return NSLocalizedString("Invalid Response StatusCode \(code)" , comment: "Status Code not 2xx")            // Status Code not 2xx
+            return NSLocalizedString("Invalid Response", comment: "URLResponse not HTTPURLResponse")
         case .response(let error):
-            return NSLocalizedString("Response Error \(error.localizedDescription)", comment: "Error from Request")     // Error from Request
-        case .decode(let error):
-            return NSLocalizedString("Decode Error \(error.localizedDescription)" , comment: "Error from Decoder")      // Error from Decoder
+            return NSLocalizedString("Response Error \(error.localizedDescription)", comment: "Error from Request")
         case .invalidRequest:
             return NSLocalizedString("Unable to create valid request for resource in environment", comment: "Error during request creation")
         }
