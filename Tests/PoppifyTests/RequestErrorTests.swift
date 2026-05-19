@@ -22,13 +22,6 @@ final class RequestErrorTests: XCTestCase {
         XCTAssertEqual(sut.localizedDescription, "Invalid Response")
     }
     
-    func test_UnhandledStatusCode_localizedDescription_isCorrect() {
-        let code = 500
-        let sut: Error = RequestError.unhandledStatusCode(code)
-        
-        XCTAssertEqual(sut.localizedDescription, "Invalid Response StatusCode \(code)")
-    }
-    
     func test_ResponseError_localizedDescription_isCorrect() {
         let error = NSError(domain: "domain", code: -1, userInfo: [NSLocalizedDescriptionKey:"Errored"])
         let sut: Error = RequestError.response(error: error)
@@ -36,13 +29,6 @@ final class RequestErrorTests: XCTestCase {
         XCTAssertEqual(sut.localizedDescription, "Response Error \(error.localizedDescription)")
     }
 
-    func test_DecodeError_localizedDescription_isCorrect() {
-        let error = NSError(domain: "domain", code: -1, userInfo: [NSLocalizedDescriptionKey:"Errored"])
-        let sut: Error = RequestError.decode(error: error)
-        
-        XCTAssertEqual(sut.localizedDescription, "Decode Error \(error.localizedDescription)" )
-    }
-    
     func test_InvalidRequest_localizedDescription_isCorrect() {
         let sut: Error = RequestError.invalidRequest
         

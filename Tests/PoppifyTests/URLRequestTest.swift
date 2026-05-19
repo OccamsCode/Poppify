@@ -65,4 +65,16 @@ final class SecureEnvironmentURLRequestTest: XCTestCase {
             rKey == "API-KEY" && rValue == "Poppify-MD5"
         })
     }
+
+    func testCreateURLRequest_httpMethod_isHEAD() throws {
+        let headRequest = MockHeadRequest(path: "/path")
+        let result = try XCTUnwrap(URLRequest(request: headRequest, in: environment))
+
+        XCTAssertEqual(result.httpMethod, "HEAD")
+    }
+}
+
+private struct MockHeadRequest: Requestable {
+    let path: String
+    var method: HTTP.Method { .HEAD }
 }
