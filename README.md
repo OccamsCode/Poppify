@@ -101,7 +101,7 @@ Clients are responsible for executing requests against a specified environment u
 ```swift
 struct CustomAsyncClient: AsyncHTTPClient {
     var environment: EnvironmentType
-    var urlSession: URLSessionType
+    var urlSession: AsyncURLSessionType
 }
 
 let client = CustomAsyncClient(
@@ -119,8 +119,8 @@ For clients conforming to `HTTPClient`, requests can be executed using completio
 ```swift
 let task = client.executeRequest(with: request) { result in
     switch result {
-    case .success(let data, let response):
-        print("Received data: \(data)")
+    case .success(let response):
+        print("Received data: \(response.data)")
     case .failure(let error):
         print(error)
     }
