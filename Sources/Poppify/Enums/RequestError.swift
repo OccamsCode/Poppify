@@ -28,7 +28,7 @@ import Foundation
 
 /// Encapsulates various types of errors encounters when executing a request
 public enum RequestError: Error {
-    /// Uable to create a valid request
+    /// Unable to create a valid request
     case invalidRequest
 
     /// The `Data?` object was nil
@@ -37,7 +37,7 @@ public enum RequestError: Error {
     /// The `response` object was not a `HTTPResponse` type
     case invalidResponse
 
-    /// The requested errored with the given error
+    /// The request failed with the given error
     case response(error: Error)
 }
 

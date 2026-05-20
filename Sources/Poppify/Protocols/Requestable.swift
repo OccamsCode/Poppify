@@ -26,7 +26,7 @@
 
 import Foundation
 
-/// A type that is used the create a `URLRequest` with a given environment
+/// A type that is used to create a `URLRequest` with a given environment
 public protocol Requestable: CustomDebugStringConvertible {
     
     /// The HTTP method used in the request
@@ -34,29 +34,36 @@ public protocol Requestable: CustomDebugStringConvertible {
     /// When not specified, defaults to `GET`
     var method: HTTP.Method { get }
     
-    /// The path in the environment
+    /// The path component of the request URL, relative to the environment's `basePath`
+    ///
+    /// Must begin with a `/`, e.g. `"/posts"`. The final URL path is `basePath + path`.
     var path: String { get }
     
     /// The parameters used in the request
     ///
     /// When not specified, defaults to an empty array
     ///
-    ///     var parameters { return [] }
+    ///     var parameters: [URLQueryItem] { return [] }
     var parameters: [URLQueryItem] { get }
-    
+
     /// The headers specific to the request
     ///
     /// When not specified, defaults to an empty dictionary
     ///
-    ///     var headers { return [:] }
+    ///     var headers: [String: String] { return [:] }
     var headers: [String: String] { get }
-    
+
     /// The optional body for the request
     ///
     /// When not specified, defaults to `nil`
     ///
-    ///     var body { return nil }
+    ///     var body: Data? { return nil }
     var body: Data? { get }
+
+    /// Attempts to create a URL for this `Requestable` within the given environment.
+    /// - Parameter environment: The environment used to construct the base URL
+    /// - Returns: A valid URL if all components are well-formed, otherwise `nil`
+    func url(using environment: EnvironmentType) -> URL?
 }
 
 public extension Requestable {
@@ -65,11 +72,6 @@ public extension Requestable {
     var headers: [String: String] { return [:] }
     var body: Data? { return nil }
     
-    /// Attempts to create URL for the `Requestable` object, within the given environment
-    /// - Parameter environment: The environment used to create the URL
-    /// - Returns: A valid URL object if the `Requestable` and `EnvironmentType` contain the correct values, otherwise returns `nil`
-    ///
-    /// The `environment.secret` is added if it's a query item
     func url(using environment: EnvironmentType) -> URL? {
         var urlComponents = URLComponents()
 

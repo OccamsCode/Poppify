@@ -63,7 +63,7 @@ public struct EnvironmentInfo: EnvironmentType, CustomDebugStringConvertible {
     }
 }
 
-/// A simple value which conforms to `EnvironmentType` and contains a `debugDescription` for debugging purposes.
+/// Renamed to `EnvironmentInfo`.
 @available(*, unavailable, renamed: "EnvironmentInfo")
 public struct Environment: EnvironmentType, CustomDebugStringConvertible {
 

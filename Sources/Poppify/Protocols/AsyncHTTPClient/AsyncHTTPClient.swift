@@ -9,12 +9,12 @@ import Foundation
 
 @available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public protocol AsyncHTTPClient: AsyncHTTPClientType {
-    /// Executes a network request with the specified resource and returns a Combine publisher.
+    /// Executes a network request with the specified requestable and returns the result using Swift concurrency.
     ///
     /// - Parameters:
-    ///   - request: The resource representing the network request to be executed.
-    /// - Returns: An HTTPClientResponse containing the result of the network request.
-    /// - Throws: An error if the network request fails.
+    ///   - request: The requestable representing the network request to be executed.
+    /// - Returns: An `HTTPClientResponse` containing the raw data and HTTP response.
+    /// - Throws: A `RequestError` if the request cannot be constructed or the network call fails.
     func asyncRequest(with request: Requestable) async throws -> HTTPClientResponse
 }
 

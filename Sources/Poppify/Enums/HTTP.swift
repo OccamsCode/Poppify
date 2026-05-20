@@ -96,7 +96,16 @@ public enum HTTP {
         /// The `DELETE` method deletes the specified resource.
         case DELETE
         
+        /// The `CONNECT` method establishes a tunnel to the server identified by the target resource.
+        case CONNECT
+
+        /// The `OPTIONS` method describes the communication options for the target resource.
+        case OPTIONS
+
         /// The `PATCH` method applies partial modifications to a resource.
         case PATCH
+
+        /// The `TRACE` method performs a message loop-back test along the path to the target resource.
+        case TRACE
     }
 }
